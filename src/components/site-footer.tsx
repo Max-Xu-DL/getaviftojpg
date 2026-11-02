@@ -24,6 +24,16 @@ export function SiteFooter() {
             hello@getaviftojpg.com
           </a>
         </p>
+        <a href="https://twelve.tools" target="_blank" className="w-fit">
+          {/* Official free badge: https://twelve.tools/badge (badge0-white). */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://twelve.tools/badge0-white.svg"
+            alt="Featured on Twelve Tools"
+            width={200}
+            height={54}
+          />
+        </a>
       </div>
     </footer>
   );
