@@ -5,6 +5,13 @@ import { Download, FileImage } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import {
+  conversionErrorKind,
+  trackConversionResult,
+  trackDownloadStarted,
+  trackFilesAdded,
+  trackSampleOpened,
+} from "@/lib/analytics";
+import {
   conversionErrorMessage,
   convertAvifToJpeg,
 } from "@/lib/convert-avif";
@@ -58,6 +65,7 @@ export function Converter() {
   const committedQuality = useRef(DEFAULT_QUALITY);
   const generations = useRef(new Map<string, number>());
   const sampleLock = useRef(false);
+  const reportedOutcome = useRef(new Map<string, "ready" | "error">());
 
   useEffect(() => {
     itemsRef.current = items;
@@ -75,6 +83,16 @@ export function Converter() {
       }
     };
   }, []);
+
+  function reportOutcome(
+    id: string,
+    outcome: "ready" | "error",
+    errorKind?: ReturnType<typeof conversionErrorKind>,
+  ) {
+    if (reportedOutcome.current.get(id) === outcome) return;
+    reportedOutcome.current.set(id, outcome);
+    trackConversionResult(outcome, outcome === "error" ? errorKind : undefined);
+  }
 
   async function encode(item: Item, nextQuality: number) {
     const generation = (generations.current.get(item.id) ?? 0) + 1;
@@ -108,9 +126,16 @@ export function Converter() {
           };
         }),
       );
+      reportOutcome(item.id, "ready");
     } catch (error) {
       if (!current()) return;
       const message = conversionErrorMessage(error);
+      const keptPrevious = itemsRef.current.some(
+        (entry) => entry.id === item.id && entry.url,
+      );
+      if (!keptPrevious) {
+        reportOutcome(item.id, "error", conversionErrorKind(message));
+      }
       setItems((prev) =>
         prev.map((entry) => {
           if (entry.id !== item.id) return entry;
@@ -169,6 +194,10 @@ export function Converter() {
     const merged = [...itemsRef.current, ...nextItems];
     itemsRef.current = merged;
     setItems(merged);
+    trackFilesAdded(nextItems.length);
+    for (const item of nextItems) {
+      if (item.rejected) reportOutcome(item.id, "error", "not_avif");
+    }
     queueEncode(nextItems, committedQuality.current);
   }
 
@@ -189,8 +218,10 @@ export function Converter() {
       if (!response.ok) throw new Error("sample missing");
       const blob = await response.blob();
       const file = new File([blob], "sample.avif", { type: "image/avif" });
+      trackSampleOpened("loaded");
       addFiles([file]);
     } catch {
+      trackSampleOpened("failed");
       setNotice("The sample image could not be loaded. Choose an AVIF instead.");
     } finally {
       sampleLock.current = false;
@@ -208,12 +239,33 @@ export function Converter() {
     anchor.remove();
   }
 
-  async function downloadAll() {
-    const ready = itemsRef.current.filter((item) => item.status === "ready" && item.url);
+  async function saveFiles(ready: Array<{ url: string; name: string }>) {
+    if (ready.length === 0) return;
+    trackDownloadStarted(ready.length);
+
+    const phone = window.matchMedia("(pointer: coarse)").matches;
+    if (phone && typeof navigator.share === "function" && typeof navigator.canShare === "function") {
+      try {
+        const files = await Promise.all(
+          ready.map(async (item) => {
+            const blob = await fetch(item.url).then((response) => response.blob());
+            return new File([blob], jpgFileName(item.name), { type: "image/jpeg" });
+          }),
+        );
+        if (navigator.canShare({ files })) {
+          await navigator.share({ files });
+          return;
+        }
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+      }
+    }
+
     for (const item of ready) {
-      if (!item.url) continue;
       downloadUrl(item.url, jpgFileName(item.name));
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      if (ready.length > 1) {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+      }
     }
   }
 
@@ -221,6 +273,7 @@ export function Converter() {
     for (const item of itemsRef.current) {
       if (item.url) URL.revokeObjectURL(item.url);
       generations.current.set(item.id, (generations.current.get(item.id) ?? 0) + 1);
+      reportedOutcome.current.delete(item.id);
     }
     itemsRef.current = [];
     setItems([]);
@@ -295,6 +348,7 @@ export function Converter() {
             accept=".avif,image/avif"
             multiple
             className="sr-only"
+            aria-label="Choose AVIF files"
             onChange={(event) => {
               if (event.target.files) addFiles(event.target.files);
               event.target.value = "";
@@ -359,7 +413,15 @@ export function Converter() {
                     type="button"
                     size="lg"
                     className="h-11 px-4"
-                    onClick={() => void downloadAll()}
+                    onClick={() =>
+                      void saveFiles(
+                        itemsRef.current.flatMap((item) =>
+                          item.status === "ready" && item.url
+                            ? [{ url: item.url, name: item.name }]
+                            : [],
+                        ),
+                      )
+                    }
                     disabled={working}
                   >
                     <Download aria-hidden="true" />
@@ -424,7 +486,9 @@ export function Converter() {
                     className="h-11 sm:shrink-0"
                     disabled={item.status !== "ready" || !item.url}
                     onClick={() => {
-                      if (item.url) downloadUrl(item.url, jpgFileName(item.name));
+                      if (item.url) {
+                        void saveFiles([{ url: item.url, name: item.name }]);
+                      }
                     }}
                   >
                     <Download aria-hidden="true" />

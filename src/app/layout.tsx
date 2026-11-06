@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Fraunces, Source_Sans_3 } from "next/font/google";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { siteOrigin } from "@/lib/site";
 import "./globals.css";
 
 const sourceSans = Source_Sans_3({
@@ -19,13 +21,13 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://getaviftojpg.com"),
+  metadataBase: new URL(siteOrigin),
   title: {
     default: "AVIF to JPG — Free Online Converter",
     template: "%s — AVIF to JPG",
   },
   description:
-    "Convert AVIF to JPG in your browser. Free, no upload to a server, keep quality options.",
+    "Convert AVIF to JPG in your browser. Files stay on your device, with a quality control and up to 30 files.",
   applicationName: "AVIF to JPG",
   robots: { index: true, follow: true },
 };
@@ -52,6 +54,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SiteHeader />
         {children}
         <SiteFooter />
+        <Analytics />
       </body>
     </html>
   );

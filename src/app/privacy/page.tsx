@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { siteUrls } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Privacy",
   description:
     "How getaviftojpg.com handles images. Conversion stays in your browser and files are not uploaded.",
-  alternates: { canonical: "https://getaviftojpg.com/privacy" },
+  alternates: { canonical: siteUrls.privacy },
 };
 
 export default function PrivacyPage() {
@@ -30,8 +31,27 @@ export default function PrivacyPage() {
         </p>
         <h2>Cookies and analytics</h2>
         <p>
-          This site does not set tracking cookies and does not run an analytics
-          script. It does not use an advertising network.
+          This site does not use an advertising network and does not set its
+          own cookies. The page does include Vercel Web Analytics. Vercel says
+          that script does not use third-party cookies, and that a visitor is
+          counted with a hash of the request that is discarded after 24 hours,
+          not a profile that follows someone across other websites.
+        </p>
+        <p>
+          When Web Analytics is enabled for this Vercel project, Vercel can
+          store a page view and a few conversion events: files were added, a
+          conversion finished or failed, the sample image was opened, or a
+          download was started. A page view can include the page address and
+          ordinary query parameters, such as a directory referrer tag. A
+          conversion event includes a count and a short outcome such as ready
+          or a failure category. None of those events include the picture, the
+          file name, or the JPG.
+        </p>
+        <p>
+          The script is in the page whether or not collection is switched on.
+          Vercel stores those visits only after Web Analytics is enabled in
+          the project settings. Turning it on does not collect visits from
+          before that switch. The code and the project setting are separate.
         </p>
         <h2>Hosting logs</h2>
         <p>

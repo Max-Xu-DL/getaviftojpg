@@ -35,7 +35,7 @@ Limits of this path: the JPG is the first frame of an animation, transparency is
 1. Import this repository in Vercel. Framework preset: Next.js. Build command: `npm run build`. Install command: `npm install`. Leave the output directory as the Next.js default.
 2. Deploy. No environment variables.
 3. In the project, open **Settings → Domains** and add `getaviftojpg.com` and `www.getaviftojpg.com`.
-4. Set `getaviftojpg.com` as the primary domain so it matches the canonical URL `https://getaviftojpg.com/`. Redirect `www` to the apex.
+4. Keep `www.getaviftojpg.com` as the host that serves the site, and permanently redirect the apex `getaviftojpg.com` to `www`. Canonical, sitemap, and Open Graph URLs are `https://www.getaviftojpg.com/`. Directory listings already use that host. Do not make the apex the primary domain unless those URLs change in the same release. The two have to name the same host.
 
 Use the DNS values shown on each domain card. They can differ by project. For most projects they are:
 
@@ -57,4 +57,12 @@ Keep Cloudflare as the DNS host and point the records at Vercel:
 
 Set both records to **DNS only** (grey cloud) while Vercel verifies the domain and issues the certificate. An orange-cloud proxy returns Cloudflare’s IPs, which blocks that check. If you turn the proxy on later, set SSL/TLS to **Full** or **Full (strict)**. **Flexible** causes redirect loops.
 
-After the domain card says Valid Configuration, `https://getaviftojpg.com/` and `https://www.getaviftojpg.com/` should both reach the site, with `www` redirecting to the apex.
+After the domain card says Valid Configuration, `https://getaviftojpg.com/` and `https://www.getaviftojpg.com/` should both reach the site, with the apex redirecting to `www`.
+
+## Analytics
+
+The site loads `@vercel/analytics`. That package does not store visits until Web Analytics is enabled for the Vercel project. Enabling it is a project setting, not part of deploying this code, and it does not backfill earlier visits.
+
+The production project is `getaviftojpg-eqis` (`prj_CseAApnhbMMvlNYl58Q2xZaGZVJp`) on team `team_VuaueflYfD4ZnxyVaD4EvvIk`. In the Vercel dashboard, open that project, then **Analytics**, and enable **Web Analytics** only if the team plan includes it without a new charge. As of 6 November 2026 the project’s analytics queries returned `web_analytics_not_enabled`, so no traffic numbers exist to read. That is not a measured zero.
+
+Once collection is on, the conversion events are `files_added`, `conversion_result`, `download_started`, and `sample_opened`, plus the automatic page view. Properties are a count and a short outcome. File names and image bytes are not sent.

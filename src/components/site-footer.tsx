@@ -24,16 +24,39 @@ export function SiteFooter() {
             hello@getaviftojpg.com
           </a>
         </p>
-        <a href="https://twelve.tools" target="_blank" className="w-fit">
-          {/* Official free badge: https://twelve.tools/badge (badge0-white). */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="https://twelve.tools/badge0-white.svg"
-            alt="Featured on Twelve Tools"
-            width={200}
-            height={54}
-          />
-        </a>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+          <a
+            href="https://twelve.tools"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-fit"
+          >
+            {/* Official free badge: https://twelve.tools/badge (badge0-white). */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://twelve.tools/badge0-white.svg"
+              alt="Featured on Twelve Tools"
+              width={200}
+              height={54}
+            />
+          </a>
+          <a
+            href="https://www.saashub.com/getaviftojpg?utm_source=badge&utm_campaign=badge&utm_content=getaviftojpg&badge_variant=color&badge_kind=approved"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-fit"
+          >
+            {/* Official approved embed from the SaaSHub product page. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://cdn-b.saashub.com/img/badges/approved-color.png?v=1"
+              alt="GetAVIFtoJPG badge"
+              width={150}
+              height={50}
+              className="h-auto w-auto max-w-[150px]"
+            />
+          </a>
+        </div>
       </div>
     </footer>
   );
