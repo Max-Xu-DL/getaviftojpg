@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { siteUrls } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Terms",
   description:
     "Plain terms for the free AVIF to JPG converter at getaviftojpg.com.",
-  alternates: { canonical: "https://getaviftojpg.com/terms" },
+  alternates: { canonical: siteUrls.terms },
 };
 
 export default function TermsPage() {

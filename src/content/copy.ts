@@ -36,7 +36,7 @@ export const guideSections = [
     title: "How to convert AVIF to JPG",
     paragraphs: [
       "Use the converter at the top of this page.",
-      "On a phone, tap Choose AVIF files and pick the image from Photos or Files. The JPG goes to your downloads folder, or the browser opens a share sheet.",
+      "On a phone, tap Choose AVIF files and pick the image from Photos or Files. The JPG downloads, or the phone opens a share sheet when that is how it saves files.",
       "The page decodes with createImageBitmap, which uses the browser’s built-in AVIF decoder in Chromium, Firefox, and Safari. If that call fails, it loads the file in an image element and draws from there. Pixels are painted on a canvas and encoded as JPEG at the quality you chose. No plugin and no extra decoder are downloaded.",
     ],
   },
@@ -61,7 +61,7 @@ export const guideSections = [
     id: "privacy-notes",
     title: "Privacy",
     paragraphs: [
-      "Files stay on your device. The site sends this page and the script that talks to the canvas. It does not receive the picture, the file name, or the JPG. There is no account and no upload address. Closing the tab drops the in-memory previews. The host can still log an IP address and a browser name, as any public site does. Those logs cannot contain your photos, because the photos never leave the browser.",
+      "Files stay on your device. The site sends this page and the script that talks to the canvas. When Vercel Web Analytics is enabled for the project, it can also receive a page view and conversion counts, not the picture, the file name, or the JPG. There is no account and no upload address. Closing the tab drops the in-memory previews. The host can still log an IP address and a browser name, as any public site does. Those logs cannot contain your photos, because the photos never leave the browser.",
     ],
   },
 ] as const;
